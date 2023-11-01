@@ -1,27 +1,30 @@
-# AngularRuntimeConfig
+# Angular Runtime Configuration Project
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.8.
+This project serves as a practical guide on how to implement and utilize Runtime Configuration in Angular applications. It addresses the common pitfalls associated with using Angular's environment configurations for runtime settings and provides a robust solution for managing environment-specific configurations without the need for multiple build artifacts.
 
-## Development server
+## A Word on Environments
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Angular provides a way to use different environment configurations which are replaced during build time. However, as mentioned in the Angular documentation, this feature should primarily be used to provide different build configurations. It is considered a bad practice to use Angular environments for runtime-related configurations, such as API endpoints. Here's why:
 
-## Code scaffolding
+- Using Angular environments for runtime configuration means each deployment stage (e.g., test, QA, production) requires a separate build artifact.
+- It's not possible to adhere to the principle of "build once, run everywhere."
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Docker Volumes
 
-## Build
+- In this example the current runtime configuration is placed at `assets/config.json`.
+- All availible available are stored at `config`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+To run the application using docker build the provided docker image:
 
-## Running unit tests
+```
+docker build -t angular-runtime-configuration .
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+When running the docker image just mount the desired configuration into the container:
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+# Local configuration
+docker run -d -p 80:80 -v $(pwd)/config/local.json:/usr/share/nginx/html/assets/config.json angular-runtime-configuration
+# Production configuration
+docker run -d -p 80:80 -v $(pwd)/config/prod.json:/usr/share/nginx/html/assets/config.json angular-runtime-configuration
+```
